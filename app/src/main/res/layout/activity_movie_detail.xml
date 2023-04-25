@@ -52,20 +52,31 @@
             android:id="@+id/recyclerViewTrailers"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/textViewDescription"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/trailer_item"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/textViewDescription"
+            tools:listitem="@layout/trailer_item" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewReviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/recyclerViewTrailers"
             android:nestedScrollingEnabled="false"
-            tools:listitem="@layout/review_item"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@+id/recyclerViewTrailers"
+            tools:listitem="@layout/review_item" />
+
+        <ImageView
+            android:id="@+id/imageViewStar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:layout_constraintBottom_toBottomOf="@id/imageViewPoster"
+            app:layout_constraintEnd_toEndOf="@id/imageViewPoster"
+            app:layout_constraintTop_toBottomOf="@id/imageViewPoster"
+            tools:srcCompat="@android:drawable/btn_star_big_on"
+
+
             />
 
 

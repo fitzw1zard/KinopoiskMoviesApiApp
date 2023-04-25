@@ -24,6 +24,8 @@ public class MovieDetailViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Review>> reviews = new MutableLiveData<>();
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
+    private final MovieDao movieDao;
+
     public LiveData<List<Trailer>> getTrailers() {
         return trailers;
     }
@@ -32,26 +34,49 @@ public class MovieDetailViewModel extends AndroidViewModel {
         return reviews;
     }
 
+    public LiveData<Movie> getFavMovie(int movieId) {
+        return movieDao.getFavMovie(movieId);
+    }
+
     public MovieDetailViewModel(@NonNull Application application) {
         super(application);
+        movieDao = MovieDatabase.getInstance(application).movieDao();
+    }
+
+
+    public void loadReviews(int id) {
+        Disposable disposable = ApiFactory.apiService.loadReviews(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .map(ReviewResponse::getReviews)
+                .subscribe(reviews::setValue, throwable -> Log.d(TAG, throwable.toString()));
+        compositeDisposable.add(disposable);
     }
 
     public void loadTrailers(int id) {
-        Disposable disposableTrailers = ApiFactory.apiService.loadTrailers(id)
+        Disposable disposable = ApiFactory.apiService.loadTrailers(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .map(trailerResponse -> trailerResponse.getTrailersLists().getTrailers())
                 .subscribe(trailers::setValue, throwable -> Log.d(TAG, throwable.toString())
                 );
-        compositeDisposable.add(disposableTrailers);
-
-        Disposable disposableReviews = ApiFactory.apiService.loadReviews(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .map(ReviewResponse::getReviews)
-                .subscribe(reviews::setValue, throwable -> Log.d(TAG, throwable.toString()));
-        compositeDisposable.add(disposableReviews);
+        compositeDisposable.add(disposable);
     }
+
+    public void insertMovie(Movie movie) {
+        Disposable disposable = movieDao.insertMovie(movie)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+        compositeDisposable.add(disposable);
+    }
+
+    public void removeMovie(int movieId) {
+        Disposable disposable = movieDao.removeMovie(movieId)
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+        compositeDisposable.add(disposable);
+    }
+
 
     @Override
     protected void onCleared() {

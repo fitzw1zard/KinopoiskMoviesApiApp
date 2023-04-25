@@ -1,12 +1,15 @@
 package com.example.movies;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,6 +38,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     private TextView textViewDescription;
     private RecyclerView recyclerViewTrailers;
     private RecyclerView recyclerViewReviews;
+    private ImageView imageViewStar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,30 @@ public class MovieDetailActivity extends AppCompatActivity {
         textViewDescription.setText(movie.getDescription());
 
         viewModel.loadTrailers(movie.getId());
+        viewModel.loadReviews(movie.getId());
+
+        Drawable starOff = ContextCompat.getDrawable(
+                MovieDetailActivity.this,
+                android.R.drawable.star_big_off
+        );
+        Drawable starOn = ContextCompat.getDrawable(
+                MovieDetailActivity.this,
+                android.R.drawable.star_big_on
+        );
+
+        viewModel.getFavMovie(movie.getId()).observe(this, favMovie -> {
+                    if (favMovie == null) {
+
+                        imageViewStar.setImageDrawable(starOff);
+                        imageViewStar.setOnClickListener(v -> viewModel.insertMovie(movie));
+                    } else {
+
+                        imageViewStar.setImageDrawable(starOn);
+                        imageViewStar.setOnClickListener(v -> viewModel.removeMovie(movie.getId()));
+                    }
+                }
+
+        );
 
         trailerAdapter.setOnPlayTrailerClickListener((trailer) -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -88,6 +116,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         textViewDescription = findViewById(R.id.textViewDescription);
         recyclerViewTrailers = findViewById(R.id.recyclerViewTrailers);
         recyclerViewReviews = findViewById(R.id.recyclerViewReviews);
+        imageViewStar = findViewById(R.id.imageViewStar);
     }
 
 
